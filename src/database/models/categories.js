@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 
+/** @type {import('sequelize').ModelAttributes} */
 const atributtes = {
   id: {
     allowNull: false,
