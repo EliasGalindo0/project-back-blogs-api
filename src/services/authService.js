@@ -5,6 +5,7 @@ require('dotenv').config();
 const authService = {
   async auth(email, pass) {
     if (!email || !pass) {
+      // tratar erro no JOI
       return { code: 400, data: { message: 'Some required fields are missing' } };
     }
 

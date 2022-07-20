@@ -1,25 +1,34 @@
+// const authService = require('../services/authService');
 const usersService = require('../services/usersService');
 
 const usersController = {
-  /** @type {import('express').RequestHandler} */
-  async list(_req, res) {
-    const users = await usersService.list();
+
+   /** @type {import('express').RequestHandler} */
+  async create(req, res) {
+    const { code, data } = await usersService.create(req.body);
+
+    res.status(code).json(data);
+  },
+
+ /** @type {import('express').RequestHandler} */
+  async getAll(_req, res) {
+    const users = await usersService.getAll();
     res.json(users);
   },
 
-  /** @type {import('express').RequestHandler} */
-  async add(req, res) {
-    const data = await usersService.validateBodyAdd(req.body);
-    const user = await usersService.add(data);
-    res.status(201).json(user);
-  },
+  //  /** @type {import('express').RequestHandler} */
+  // async getById(req, res) {
+  //   const { id } = req.params;
+  //   const { code, data } = await usersService.getById(+id);
+  //   res.status(code).json(data);
+  // },
 
-  /** @type {import('express').RequestHandler} */
-  async get(req, res) {
-    const { id } = await usersService.validateParamsId(req.params);
-    const user = await usersService.getEager(id);
-    res.json(user);
-  },
+  //  /** @type {import('express').RequestHandler} */
+  // async remove(req, res) {
+  //   const userId = authService.auth(req.headers.authorization);
+  //   await usersService.remove(userId.data);
+  //   res.status(204).end();
+  // },
 };
 
 module.exports = usersController;

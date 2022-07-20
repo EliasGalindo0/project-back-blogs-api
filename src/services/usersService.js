@@ -1,29 +1,60 @@
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
 const models = require('../database/models');
+const errorHandler = require('../middlewares/errorHandler');
+require('dotenv').config();
+
+const schemaUser = Joi.object({
+  displayName: Joi.string().min(8).required().messages({
+    'string.min': '400|"displayName" length must be at least 8 characters long',
+  }),
+  email: Joi.string().email().required().messages({
+    'string.email': '400|"email" must be a valid email',
+  }),
+  password: Joi.string().min(6).messages({
+    'string.min': '400|"password" length must be at least 6 characters long',
+  }),
+  image: Joi.string(),
+});
 
 const usersService = {
-  async validateBodyAdd(unknown) {
-    const schema = Joi.object({
-      email: Joi.string().required().email().max(255),
-      passwordHash: Joi.string().required().max(255),
-    });
-    const result = await schema.validateAsync(unknown);
-    return result;
+  async create(values) {
+    const isErrorValidation = errorHandler(schemaUser)(values);
+    if (isErrorValidation) {
+      return { code: isErrorValidation[0], data: { message: isErrorValidation[1] } };
+    }
+
+    const isEmailAlreadyRegisted = await models.User.findOne({ where: { email: values.email } });
+    if (isEmailAlreadyRegisted) return { code: 409, data: { message: 'User already registered' } };
+
+    const newUser = await models.User.create(values, { raw: true });
+    const { dataValues: { id } } = newUser;
+    const token = jwt.sign({ data: id }, process.env.JWT_SECRET);
+
+    return { code: 201, data: { token } };
   },
 
-  async add(data) {
-    const model = await models.users.create(data);
-    const newUser = model.toJSON();
-    const { passwordHash, ...user } = newUser;
-    return user;
+  async getAll() {
+    return models.User.findAll({ attributes: { exclude: ['password'] } });
   },
 
-  async list() {
-    const users = await models.users.findAll({
-      attributes: { exclude: ['passwordHash'] },
-    });
-    return users;
-  },
+  // async getById(id) {
+  //   const isFindUser = await models.User.findByPk(id, { raw: true });
+  //   if (!isFindUser) return { code: 404, data: { message: 'User does not exist' } };
+
+  //   const { password, ...restDataUser } = isFindUser;
+  //   return { code: 200, data: restDataUser };
+  // },
+
+  // async remove(id) {
+  //   const postByUser = await models.BlogPost.findAll({ where: { userId: id } }, { raw: true });
+
+  //   await Promise.all(
+  //     postByUser.map(async (post) => models.PostCategory.destroy({ where: { postId: post.id } })),
+  //   );
+  //   await models.BlogPost.destroy({ where: { userId: id } });
+  //   await models.User.destroy({ where: { id } });
+  // },
 };
 
 module.exports = usersService;
