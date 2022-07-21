@@ -1,4 +1,4 @@
-// const authService = require('../services/authService');
+const authService = require('../services/authService');
 const usersService = require('../services/usersService');
 
 const usersController = {
@@ -16,19 +16,19 @@ const usersController = {
     res.json(users);
   },
 
-  //  /** @type {import('express').RequestHandler} */
-  // async getById(req, res) {
-  //   const { id } = req.params;
-  //   const { code, data } = await usersService.getById(+id);
-  //   res.status(code).json(data);
-  // },
+   /** @type {import('express').RequestHandler} */
+  async getById(req, res) {
+    const { id } = req.params;
+    const { code, data } = await usersService.getById(+id);
+    res.status(code).json(data);
+  },
 
-  //  /** @type {import('express').RequestHandler} */
-  // async remove(req, res) {
-  //   const userId = authService.auth(req.headers.authorization);
-  //   await usersService.remove(userId.data);
-  //   res.status(204).end();
-  // },
+   /** @type {import('express').RequestHandler} */
+  async remove(req, res) {
+    const userId = authService.auth(req.headers.authorization);
+    await usersService.remove(userId.data);
+    res.status(204).end();
+  },
 };
 
 module.exports = usersController;

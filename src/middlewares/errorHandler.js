@@ -1,4 +1,4 @@
-const validation = (schema) => (values) => {
+const errorValidation = (schema) => (values) => {
   const { error } = schema.validate(values);
 
   if (error) {
@@ -7,4 +7,4 @@ const validation = (schema) => (values) => {
   }
 };
 
-module.exports = validation;
+module.exports = errorValidation;

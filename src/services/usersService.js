@@ -19,13 +19,13 @@ const schemaUser = Joi.object({
 
 const usersService = {
   async create(values) {
-    const isErrorValidation = errorHandler(schemaUser)(values);
-    if (isErrorValidation) {
-      return { code: isErrorValidation[0], data: { message: isErrorValidation[1] } };
+    const error = errorHandler(schemaUser)(values);
+    if (error) {
+      return { code: error[0], data: { message: error[1] } };
     }
 
-    const isEmailAlreadyRegisted = await models.User.findOne({ where: { email: values.email } });
-    if (isEmailAlreadyRegisted) return { code: 409, data: { message: 'User already registered' } };
+    const emailRegistered = await models.User.findOne({ where: { email: values.email } });
+    if (emailRegistered) return { code: 409, data: { message: 'User already registered' } };
 
     const newUser = await models.User.create(values, { raw: true });
     const { dataValues: { id } } = newUser;
@@ -38,23 +38,23 @@ const usersService = {
     return models.User.findAll({ attributes: { exclude: ['password'] } });
   },
 
-  // async getById(id) {
-  //   const isFindUser = await models.User.findByPk(id, { raw: true });
-  //   if (!isFindUser) return { code: 404, data: { message: 'User does not exist' } };
+  async getById(id) {
+    const isFindUser = await models.User.findByPk(id, { raw: true });
+    if (!isFindUser) return { code: 404, data: { message: 'User does not exist' } };
 
-  //   const { password, ...restDataUser } = isFindUser;
-  //   return { code: 200, data: restDataUser };
-  // },
+    const { password, ...restDataUser } = isFindUser;
+    return { code: 200, data: restDataUser };
+  },
 
-  // async remove(id) {
-  //   const postByUser = await models.BlogPost.findAll({ where: { userId: id } }, { raw: true });
+  async remove(id) {
+    const postByUser = await models.BlogPost.findAll({ where: { userId: id } }, { raw: true });
 
-  //   await Promise.all(
-  //     postByUser.map(async (post) => models.PostCategory.destroy({ where: { postId: post.id } })),
-  //   );
-  //   await models.BlogPost.destroy({ where: { userId: id } });
-  //   await models.User.destroy({ where: { id } });
-  // },
+    await Promise.all(
+      postByUser.map(async (post) => models.PostCategory.destroy({ where: { postId: post.id } })),
+    );
+    await models.BlogPost.destroy({ where: { userId: id } });
+    await models.User.destroy({ where: { id } });
+  },
 };
 
 module.exports = usersService;
