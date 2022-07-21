@@ -1,12 +1,12 @@
 const { Router } = require('express');
 const usersController = require('../controllers/usersController');
-// const authorizeMiddleware = require('../middlewares/authorizeMiddleware');
+const authorizeMiddleware = require('../middlewares/authorizeMiddleware');
 
 const usersRoute = Router();
 
 usersRoute.delete('/me', usersController.remove);
-usersRoute.get('/:id', usersController.getById);
-usersRoute.get('/', usersController.getAll);
+usersRoute.get('/:id', authorizeMiddleware.auth, usersController.getById);
+usersRoute.get('/', authorizeMiddleware.auth, usersController.getAll);
 usersRoute.post('/', usersController.create);
 
 module.exports = usersRoute;
