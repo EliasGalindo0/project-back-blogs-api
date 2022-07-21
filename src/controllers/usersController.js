@@ -1,4 +1,4 @@
-const authService = require('../services/authService');
+const loginService = require('../services/loginService');
 const usersService = require('../services/usersService');
 
 const usersController = {
@@ -25,7 +25,7 @@ const usersController = {
 
    /** @type {import('express').RequestHandler} */
   async remove(req, res) {
-    const userId = authService.auth(req.headers.authorization);
+    const userId = loginService.auth(req.headers.authorization);
     await usersService.remove(userId.data);
     res.status(204).end();
   },

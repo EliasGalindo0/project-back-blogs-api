@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const models = require('../database/models');
-const errorHandler = require('../middlewares/errorHandler');
+const errorValidation = require('../middlewares/errorHandler');
 require('dotenv').config();
 
 const schemaUser = Joi.object({
@@ -19,10 +19,19 @@ const schemaUser = Joi.object({
 
 const usersService = {
   async create(values) {
-    const error = errorHandler(schemaUser)(values);
+    // const quantField = values.every(({ quantity }) => quantity || quantity === 0);
+    // if (!quantField) { throw ValidateError(400, '"quantity" is required'); }
+    
+    // const quantLength = body.every(({ quantity }) => quantity > 0);
+    // if (!quantLength) {
+    //   throw ValidateError(422, '"quantity" must be greater than or equal to 1');
+    // }
+    
+    const error = errorValidation(schemaUser)(values);
     if (error) {
       return { code: error[0], data: { message: error[1] } };
     }
+    console.log(values);
 
     const emailRegistered = await models.User.findOne({ where: { email: values.email } });
     if (emailRegistered) return { code: 409, data: { message: 'User already registered' } };
@@ -39,10 +48,10 @@ const usersService = {
   },
 
   async getById(id) {
-    const isFindUser = await models.User.findByPk(id, { raw: true });
-    if (!isFindUser) return { code: 404, data: { message: 'User does not exist' } };
+    const user = await models.User.findByPk(id, { raw: true });
+    if (!user) return { code: 404, data: { message: 'User does not exist' } };
 
-    const { password, ...restDataUser } = isFindUser;
+    const { password, ...restDataUser } = user;
     return { code: 200, data: restDataUser };
   },
 
