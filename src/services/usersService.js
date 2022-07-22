@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const models = require('../database/models');
-const errorValidation = require('../middlewares/errorHandler');
+const errorValidation = require('../middlewares/errorValidation');
 require('dotenv').config();
 
 const schemaUser = Joi.object({
