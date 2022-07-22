@@ -19,19 +19,10 @@ const schemaUser = Joi.object({
 
 const usersService = {
   async create(values) {
-    // const quantField = values.every(({ quantity }) => quantity || quantity === 0);
-    // if (!quantField) { throw ValidateError(400, '"quantity" is required'); }
-    
-    // const quantLength = body.every(({ quantity }) => quantity > 0);
-    // if (!quantLength) {
-    //   throw ValidateError(422, '"quantity" must be greater than or equal to 1');
-    // }
-    
     const error = errorValidation(schemaUser)(values);
     if (error) {
       return { code: error[0], data: { message: error[1] } };
     }
-    console.log(values);
 
     const emailRegistered = await models.User.findOne({ where: { email: values.email } });
     if (emailRegistered) return { code: 409, data: { message: 'User already registered' } };
