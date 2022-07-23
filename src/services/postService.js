@@ -12,41 +12,47 @@ const schemaPost = Joi.object({
 
 const postService = {
   async create(values, userId) {
-    const isErrValid = errorValidation(schemaPost)(values);
-    if (isErrValid) return { code: 400, data: { message: 'Some required fields are missing' } };
+    const fieldsValidation = errorValidation(schemaPost)(values);
+    if (fieldsValidation) {
+      return { code: 400, data: { message: 'Some required fields are missing' } };
+    }
 
     // const { categoryId } = values;
-    const areCategoriesExist = await checkCategory(values.categoryId);
-    if (!areCategoriesExist) return { code: 400, data: { message: '"categoryIds" not found' } };
+    const categories = await checkCategory(values.categoryId);
+    if (!categories) return { code: 400, data: { message: '"categoryIds" not found' } };
 
-    const newPostValues = {
+    const postValues = {
       title: values.title,
       content: values.content,
       userId,
     };
-    const newPost = await models.BlogPost.create(newPostValues);
+    const newPost = await models.BlogPost.create(postValues);
     Promise.all(
-      areCategoriesExist.map(async ({ id }) => models.PostCategory
+      categories.map(async ({ id }) => models.PostCategory
       .create({ postId: newPost.id, categoryId: id })),
       );
-    return { code: 201, data: newPost };
+    return { code: 201, newPost };
   },
 
   async get() {
     const posts = await models.BlogPost.findAll({
       include:
-      [{ model:
-        models.User, 
-        as: 'user', 
-        attributes: { exclude: 'password' },  
-        },
-      { model:
-        models.Category,
-        as: 'categories',
-        through: { attributes: [] } }, 
+      [{ model: models.User, as: 'user', attributes: { exclude: 'password' } },
+      { model: models.Category, as: 'categories', through: { attributes: [] } }, 
       ],
     }); 
-    return posts;
+    return { code: 200, posts };
+  },
+
+  async getById(id) {
+    const result = await models.BlogPost.findByPk(id,
+      { include: [
+        { model: models.User, as: 'user', attributes: { exclude: 'password' } }, 
+        { model: models.Category, as: 'categories', through: { attributes: [] } },
+    ],
+  });
+    return result;
+  // return result;
   },
 };
 
