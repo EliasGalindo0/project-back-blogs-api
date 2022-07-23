@@ -1,6 +1,7 @@
 'use strict';
 const { DataTypes } = require('sequelize')
 
+/** @type {import('sequelize').ModelAttributes} */
 const attributes = {
   postId: {
     type: DataTypes.INTEGER,
@@ -22,6 +23,7 @@ const attributes = {
   },
 }
 
+/** @param {import('sequelize').Sequelize} sequelize */
 module.exports = (sequelize) => {
   const postCategory = sequelize.define('PostCategory', attributes, { timestamps: false })
 
