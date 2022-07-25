@@ -52,7 +52,6 @@ const postService = {
     ],
   });
     return result;
-  // return result;
   },
 };
 
