@@ -29,10 +29,11 @@
     "test": "npx -y wait-on -t 300000 http://localhost:3030 && NODE_ENV=test jest -i --verbose --forceExit",
     "posttest": "npm run kill:test",
     "test-coverage": "jest -i --verbose --forceExit --coverage",
-    "debug": "nodemon .",
+    "debug": "nodemon --watch src .",
     "lint": "eslint --no-inline-config --no-error-on-unmatched-pattern -c .eslintrc.json .",
     "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
-    "mytest": "jest -i --verbose --forceExit"
+    "mytest": "jest -i --verbose --forceExit",
+    "compose:dev": "docker-compose -f docker-compose.dev.yml down && docker-compose -f docker-compose.dev.yml up -d"
   },
   "devDependencies": {
     "eslint": "6.8.0",

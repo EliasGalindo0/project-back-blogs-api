@@ -4,7 +4,9 @@ const postService = require('../services/postService');
 const postController = {
   async create(req, res) {
     const userId = authorizeMiddleware.getToken(req.headers.authorization);
+    console.log(userId);
     const { code, data } = await postService.create(req.body, userId.data);
+    console.log({ code, data });
 
     res.status(code).json(data);
   },
@@ -17,12 +19,11 @@ const postController = {
   async getById(req, res) {
     const { id } = req.params;
     const response = await postService.getPostById(id);
-    console.log(response);
     if (!response) {
-        return res.status(404).json({ message: 'Post does not exist' });
+      return res.status(404).json({ message: 'Post does not exist' });
     }
     return res.status(200).json(response);
   },
 };
 
-  module.exports = postController;
+module.exports = postController;

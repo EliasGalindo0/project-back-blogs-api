@@ -4,6 +4,7 @@ module.exports = {
     await queryInterface.createTable('PostCategories', {
       postId: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         foreingKey: true,
       },
       categoryId: {
