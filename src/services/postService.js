@@ -44,14 +44,16 @@ const postService = {
   },
 
   async getById(id) {
-    const result = await models.BlogPost.findByPk(id,
-      {
-        include: [
-          { model: models.User, as: 'user', attributes: { exclude: 'password' } },
-          { model: models.Category, as: 'categories', through: { attributes: [] } },
+    const result = await models.BlogPost.findByPk(id, {
+      include:
+        [{ model: models.User, as: 'user', attributes: { exclude: 'password' } },
+        { model: models.Category, as: 'categories', through: { attributes: [] } },
         ],
-      });
-    return result;
+    });
+    console.log(result);
+    if (!result) return { code: 404, data: { message: 'Post does not exist' } };
+    console.log(result);
+    return { code: 200, data: result };
   },
 };
 

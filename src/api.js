@@ -1,7 +1,6 @@
 const express = require('express');
 require('express-async-errors');
 const errorMiddleware = require('./middlewares/errorMiddleware');
-// const errorValidation = require('./middlewares/errorValidation');
 const categoryRoute = require('./routes/categoryRoute');
 const loginRoute = require('./routes/loginRoute');
 const postRoute = require('./routes/postRoute');
