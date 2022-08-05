@@ -8,7 +8,7 @@ const auth = async (req, res, next) => {
   try {
     jwt.verify(authorization, process.env.JWT_SECRET);
     return next();
-  } catch (e) {
+  } catch (error) {
     res.status(401).json({ message: 'Expired or invalid token' });
   }
 };

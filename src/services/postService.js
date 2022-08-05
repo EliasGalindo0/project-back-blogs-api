@@ -10,6 +10,11 @@ const schemaPost = Joi.object({
   categoryIds: Joi.array().required(),
 });
 
+const schemaEdit = Joi.object({
+  title: Joi.string().required(),
+  content: Joi.string().required(),
+});
+
 const postService = {
   async create(dataValues, userId) {
     const fieldsValidation = errorValidation(schemaPost)(dataValues);
@@ -50,9 +55,31 @@ const postService = {
         { model: models.Category, as: 'categories', through: { attributes: [] } },
         ],
     });
-    console.log(result);
     if (!result) return { code: 404, data: { message: 'Post does not exist' } };
     console.log(result);
+    return { code: 200, data: result };
+  },
+
+  async edit(dataValues, postId, userId) {
+    if (postId !== userId) return { code: 401, data: { message: 'Unauthorized user' } };
+
+    const validation = errorValidation(schemaEdit)(dataValues);
+    if (validation) return { code: 400, data: { message: 'Some required fields are missing' } };
+
+    const postValues = {
+      title: dataValues.title,
+      content: dataValues.content,
+    };
+    await models.BlogPost.update(postValues, { where: { id: postId } });
+    const result = await models.BlogPost.findByPk(
+      postId,
+      {
+        include: [
+          { model: models.User, as: 'user', attributes: { exclude: ['password'] } },
+          { model: models.Category, as: 'categories' },
+        ],
+      },
+    );
     return { code: 200, data: result };
   },
 };
