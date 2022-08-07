@@ -33,8 +33,8 @@ const postController = {
 
   async remove(req, res) {
     const userId = authorizeMiddleware.getToken(req.headers.authorization);
-
-    const { code, data } = await postService.remove(Number(req.params.id), Number(userId.data));
+    const { id } = req.params;
+    const { code, data } = await postService.remove(Number(id), Number(userId.data));
     res.status(code).json(data);
   },
 };

@@ -4,7 +4,7 @@ const authorizeMiddleware = require('../middlewares/authorizeMiddleware');
 
 const usersRoute = Router();
 
-usersRoute.delete('/me', usersController.remove);
+usersRoute.delete('/me', authorizeMiddleware.auth, usersController.remove);
 usersRoute.get('/:id', authorizeMiddleware.auth, usersController.getById);
 usersRoute.get('/', authorizeMiddleware.auth, usersController.getAll);
 usersRoute.post('/', usersController.create);
