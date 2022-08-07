@@ -82,6 +82,23 @@ const postService = {
     );
     return { code: 200, data: result };
   },
+
+  async remove(postId, userId) {
+    const removePost = await models.BlogPost.findByPk(postId);
+    if (!removePost) return { code: 404, data: { message: 'Post does not exist' } };
+    if (removePost.userId !== userId) {
+      return { code: 401, data: { message: 'Unauthorized user' } };
+    }
+
+    await models.PostCategory.destroy({
+      where: {
+        postId,
+      },
+    });
+    await models.BlogPost.destroy({ where: { id: postId } });
+
+    return { code: 204 };
+  },
 };
 
 module.exports = postService;
