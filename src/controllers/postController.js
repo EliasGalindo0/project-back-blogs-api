@@ -37,6 +37,13 @@ const postController = {
     const { code, data } = await postService.remove(Number(id), Number(userId.data));
     res.status(code).json(data);
   },
+
+  async find(req, res) {
+    const { q } = req.query;
+    console.log(q);
+    const queryPostIds = await postService.find(q);
+    res.status(200).json(queryPostIds);
+  },
 };
 
 module.exports = postController;

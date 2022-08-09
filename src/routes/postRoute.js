@@ -4,6 +4,7 @@ const postController = require('../controllers/postController');
 
 const postRoute = Router();
 
+postRoute.get('/search', authorizeMiddleware.auth, postController.find);
 postRoute.delete('/:id', authorizeMiddleware.auth, postController.remove);
 postRoute.get('/:id', authorizeMiddleware.auth, postController.getById);
 postRoute.get('/', authorizeMiddleware.auth, postController.get);

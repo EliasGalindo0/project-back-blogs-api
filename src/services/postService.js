@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { Op } = require('sequelize');
 const models = require('../database/models');
 const checkCategory = require('../middlewares/checkCategories');
 const errorValidation = require('../middlewares/errorValidation');
@@ -14,6 +15,11 @@ const schemaEdit = Joi.object({
   title: Joi.string().required(),
   content: Joi.string().required(),
 });
+
+const include = [
+  { model: models.User, as: 'user', attributes: { exclude: ['password'] } },
+  { model: models.Category, as: 'categories' },
+];
 
 const postService = {
   async create(dataValues, userId) {
@@ -40,20 +46,14 @@ const postService = {
 
   async get() {
     const posts = await models.BlogPost.findAll({
-      include:
-        [{ model: models.User, as: 'user', attributes: { exclude: 'password' } },
-        { model: models.Category, as: 'categories', through: { attributes: [] } },
-        ],
+      include,
     });
     return { code: 200, posts };
   },
 
   async getById(id) {
     const result = await models.BlogPost.findByPk(id, {
-      include:
-        [{ model: models.User, as: 'user', attributes: { exclude: 'password' } },
-        { model: models.Category, as: 'categories', through: { attributes: [] } },
-        ],
+      include,
     });
     if (!result) return { code: 404, data: { message: 'Post does not exist' } };
     console.log(result);
@@ -74,10 +74,7 @@ const postService = {
     const result = await models.BlogPost.findByPk(
       postId,
       {
-        include: [
-          { model: models.User, as: 'user', attributes: { exclude: ['password'] } },
-          { model: models.Category, as: 'categories' },
-        ],
+        include,
       },
     );
     return { code: 200, data: result };
@@ -98,6 +95,27 @@ const postService = {
     await models.BlogPost.destroy({ where: { id: postId } });
 
     return { code: 204 };
+  },
+
+  async find(q) {
+    const post = await models.BlogPost.findAll({
+      where: {
+        [Op.or]: [
+          {
+            title: {
+              [Op.like]: `%${q}%`,
+            },
+          },
+          {
+            content: {
+              [Op.like]: `%${q}%`,
+            },
+          },
+        ],
+      },
+      include,
+    });
+    return post;
   },
 };
 
